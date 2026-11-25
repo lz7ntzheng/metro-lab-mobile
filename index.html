@@ -5,7 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#141918">
   <meta name="description" content="地铁逃生座谈会 · 赛季末物品传世仓库交互测试">
-  <title>地铁逃生 · 传世仓库（单文件版 2026-11-24 · 七档品阶 · 手机清单图片版）</title>
+  <title>地铁逃生 · 传世仓库（单文件版 2026-11-25 · 数量角标自适应 · 手机兼容版）</title>
+  <script>
+  /* 旧版手机浏览器 / 微信内核兼容层：纯 ES5，必须先于主脚本执行。
+     同时把脚本异常显示到页面上，避免再次出现「页面能开但物品全空且无任何提示」。 */
+  (function(){
+    if(!Object.fromEntries){
+      Object.fromEntries=function(pairs){
+        var o={},i,kv;
+        if(!pairs)return o;
+        for(i=0;i<pairs.length;i++){kv=pairs[i];if(kv)o[kv[0]]=kv[1];}
+        return o;
+      };
+    }
+    if(!Array.prototype.flatMap){
+      Array.prototype.flatMap=function(fn,that){
+        var out=[],i,j,r;
+        for(i=0;i<this.length;i++){
+          r=fn.call(that,this[i],i,this);
+          if(r&&Object.prototype.toString.call(r)==='[object Array]'){for(j=0;j<r.length;j++)out.push(r[j]);}
+          else out.push(r);
+        }
+        return out;
+      };
+    }
+    if(!String.prototype.replaceAll){
+      String.prototype.replaceAll=function(a,b){
+        if(a instanceof RegExp)return this.replace(a,b);
+        return this.split(a).join(b);
+      };
+    }
+    var shown=false;
+    function show(msg){
+      if(shown)return;shown=true;
+      try{
+        var d=document.createElement('div');
+        d.setAttribute('data-boot-error','1');
+        d.style.cssText='position:fixed;z-index:2147483647;left:0;right:0;top:0;padding:10px 12px;background:#8b1a1a;color:#fff;font:13px/1.5 -apple-system,BlinkMacSystemFont,sans-serif;word-break:break-all';
+        d.textContent='加载异常（物品可能为空）：'+msg+' ｜ 请换 Chrome / Safari 打开或下拉刷新重试';
+        function mount(){document.body.appendChild(d);}
+        if(document.body)mount();else document.addEventListener('DOMContentLoaded',mount);
+      }catch(e){}
+    }
+    window.onerror=function(msg,src,line,col){show(msg+' @'+line+':'+col);return false;};
+    if(window.addEventListener){
+      window.addEventListener('unhandledrejection',function(e){
+        show('Promise '+(e.reason&&e.reason.message?e.reason.message:e.reason));
+      });
+      document.addEventListener('DOMContentLoaded',function(){
+        setTimeout(function(){
+          try{
+            var g=document.getElementById('original-grid');
+            if(g&&g.querySelectorAll('.item-slot').length===0){
+              show('物品未渲染（浏览器内核过旧或脚本被拦截）');
+            }
+          }catch(e){}
+        },1800);
+      });
+    }
+  })();
+  </script>
   <style>
 :root{color-scheme:dark;--bg:#141918;--panel:#1e2523;--surface:#28302d;--line:#46504a;--text:#efefe7;--muted:#b8c0b5;--accent:#edc56e;--accent-ink:#231d11;--danger:#f1a9a0;--font:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.5;font-variant-numeric:tabular-nums}button,input,select{font:inherit}button,a,input,select{-webkit-tap-highlight-color:transparent}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.45}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}::selection{background:var(--accent);color:var(--accent-ink)}input{caret-color:var(--accent)}svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}h1,h2,h3,p{margin:0}button{border:0}a{color:var(--accent);text-underline-offset:4px}button,select{touch-action:manipulation}button:not(:disabled){transition:background .16s,border-color .16s,color .16s}button:not(:disabled):hover{filter:brightness(1.12)}[hidden]{display:none!important}
@@ -70,7 +129,7 @@
 .sheet-thumb{position:relative;display:flex;align-items:center;justify-content:center;min-height:0;flex:1;width:100%}
 .sheet-thumb img{width:100%;height:100%;max-height:60px;object-fit:contain}
 .sheet-thumb svg{width:28px;height:28px;color:var(--muted)}
-.sheet-qty{position:absolute;right:0;top:0;background:var(--accent);color:#231d11;font-size:9px;font-weight:700;padding:0 4px;line-height:14px;border-radius:2px;white-space:nowrap}
+.sheet-qty{position:absolute;right:2px;top:2px;z-index:2;background:var(--accent);color:#231d11;font-size:var(--qty-fs,20px);font-weight:800;padding:0 var(--qty-pad,7px);line-height:1.45;border-radius:var(--qty-radius,5px);white-space:nowrap;letter-spacing:.01em;font-variant-numeric:tabular-nums;box-shadow:0 2px 8px rgba(0,0,0,.55)}
 .sheet-cell-name{width:100%;font-size:10px;line-height:1.15;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-all}
 .sheet-cell-value{width:100%;font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sheet-cell[data-rarity=orange]{border-left-color:#ee961b;background:linear-gradient(160deg,#24170f,#3a2515)}
@@ -91,7 +150,7 @@
 .sheet-grid[data-density="4"] .sheet-cell-value{display:none}
 .sheet-grid[data-density="4"] .sheet-cell-name{font-size:9px;line-height:1.1}
 .sheet-grid[data-density="4"] .sheet-cell{gap:1px;padding:2px}
-.sheet-grid[data-density="4"] .sheet-qty{font-size:8px;line-height:12px;padding:0 3px}
+.sheet-grid[data-density="4"] .sheet-qty{box-shadow:0 1px 4px rgba(0,0,0,.5)}
 .sheet-grid[data-density="4"] .sheet-thumb img{max-height:38px}
 .sheet-empty{grid-column:1/-1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;border:1px dashed var(--line);padding:12px}
 .sheet-foot{display:flex;justify-content:space-between;gap:10px;font-size:10px;color:var(--muted);padding-top:6px;border-top:1px solid #3a433b;white-space:nowrap;flex-shrink:0}
@@ -258,22 +317,26 @@ function transfer(items, initial, stored, itemId, quantity, direction, capacity)
   } else if (direction !== 'out' || quantity > (stored[itemId] || 0)) {
     throw new Error('可取出数量不足');
   }
-  return {...stored, [itemId]: (stored[itemId] || 0) + quantity * (direction === 'in' ? 1 : -1)};
+  const next = Object.assign({}, stored);
+  next[itemId] = (stored[itemId] || 0) + quantity * (direction === 'in' ? 1 : -1);
+  return next;
 }
 function makeStacks(items, quantities, side) {
-  return items.flatMap(item => {
+  let out = [];
+  for (const item of items) {
     const count = quantities[item.id] || 0;
     const limit = item.category === 'equipment' ? 1 : item.stackLimit;
-    return Array.from({length:Math.ceil(count / limit)}, (_, index) => ({
+    out = out.concat(Array.from({length:Math.ceil(count / limit)}, (_, index) => ({
       key:`${side}:${item.id}:${index}`,id:item.id,side,index,
       count:Math.min(limit,count-index*limit)
-    }));
-  });
+    })));
+  }
+  return out;
 }
 function transferBatch(items, initial, stored, requests, capacity) {
   if(!Array.isArray(requests)||!requests.length) throw new Error('请先勾选需要存入的物品格');
   const keys = new Set();
-  let next = {...stored};
+  let next = Object.assign({}, stored);
   for(const request of requests){
     if(request.key && keys.has(request.key)) throw new Error('同一物品格不能重复选择');
     if(request.key) keys.add(request.key);
@@ -292,10 +355,10 @@ function validateConfig(value) {
     for (const [key, max] of [['price', 100000000], ['stackLimit', 9999], ['slotsPerStack', 120]]) {
       if (!Number.isInteger(i[key]) || i[key] < (key === 'price' ? 0 : 1) || i[key] > max) throw new Error(`${i.name} 的价格、堆叠或占格无效`);
     }
-    return {...i, category: i.category === 'equipment' ? 'equipment' : 'valuable', inheritable: i.category !== 'equipment' && i.inheritable !== false, stackLimit:i.category==='equipment'?1:999, slotsPerStack:i.category==='equipment'?1:i.slotsPerStack, image: /^[a-z0-9_-]+$/.test(i.image || '') ? i.image : null};
+    return Object.assign({}, i, {category: i.category === 'equipment' ? 'equipment' : 'valuable', inheritable: i.category !== 'equipment' && i.inheritable !== false, stackLimit:i.category==='equipment'?1:999, slotsPerStack:i.category==='equipment'?1:i.slotsPerStack, image: /^[a-z0-9_-]+$/.test(i.image || '') ? i.image : null});
   });
   for (const profile of ['low', 'mid', 'high']) {
-    const p = value.profiles?.[profile];
+    const p = value.profiles ? value.profiles[profile] : null;
     if (!p || typeof p !== 'object') throw new Error('配置必须包含 low、mid、high 三套库存');
     let count = 0;
     for (const [id, q] of Object.entries(p)) {
@@ -304,7 +367,7 @@ function validateConfig(value) {
     }
     if (count > 150000) throw new Error('每套库存最多 150000 件');
   }
-  return {...value, items};
+  return Object.assign({}, value, {items:items});
 }
 
 const $ = s => document.querySelector(s);
@@ -319,7 +382,7 @@ const rarityOrder = {orange:0,red:1,pink:2,purple:3,blue:4,green:5,white:6};
 const rarityNames = {orange:'金色',red:'红色',pink:'粉色',purple:'紫色',blue:'蓝色',green:'绿色',white:'白色'};
 const rarityColors = {orange:'#ee961b',red:'#ee535b',pink:'#e77bc6',purple:'#a98cf0',blue:'#4a9dea',green:'#43b87a',white:'#c9d2dc'};
 const key = 'metro-inheritance-research-v1';
-const uid = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+const uid = () => { try { if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID(); } catch(e) {} return `${Date.now()}-${Math.random().toString(16).slice(2)}`; };
 let config, state, rounds = [], selected = null, filter = 'all', quantity = 1, toastTimer;
 let storageOK = true;
 let batchMode = false, batchKeys = new Set();
@@ -341,11 +404,11 @@ function notify(message) {
 }
 function persist() {
   try { localStorage.setItem(key, JSON.stringify({config,state,rounds})); }
-  catch { storageOK = false; notify('设备无法保存，请及时导出结果，关闭页面后可能丢失。'); }
+  catch(e){ storageOK = false; notify('设备无法保存，请及时导出结果，关闭页面后可能丢失。'); }
 }
 function initial() { return config.profiles[state.profile]; }
 function record(action, details = {}) {
-  state.events.push({action,at:new Date().toISOString(),elapsedMs:Date.now()-state.startedMs,...details});
+  state.events.push(Object.assign({action:action,at:new Date().toISOString(),elapsedMs:Date.now()-state.startedMs},details));
 }
 function snapshot(status) {
   return {roundId:state.roundId,participant:state.participant,roundNumber:state.roundNumber,profile:state.profile,profileLabel:labels[state.profile],capacity:state.capacity,status,startedAt:new Date(state.startedMs).toISOString(),savedAt:new Date().toISOString(),durationMs:Date.now()-state.startedMs,initial:clone(initial()),stored:clone(state.stored),usedSlots:usedSlots(config.items,state.stored),totalValue:totalValue(config.items,state.stored),events:clone(state.events),configSnapshot:clone(config)};
@@ -365,7 +428,8 @@ function renderCapacities() {
   $('#capacity-options').innerHTML = config.capacities.map(n=>`<button data-capacity="${n}" aria-pressed="${n===state.capacity}">${n} 格</button>`).join('');
 }
 function currentStacks(side) {
-  const counts=Object.fromEntries(config.items.map(i=>[i.id,side==='out'?(state.stored[i.id]||0):(initial()[i.id]||0)-(state.stored[i.id]||0)]));
+  const counts={};
+  for(const ci of config.items) counts[ci.id]=side==='out'?(state.stored[ci.id]||0):(initial()[ci.id]||0)-(state.stored[ci.id]||0);
   return makeStacks(config.items,counts,side);
 }
 function batchStacks() { return currentStacks('in').filter(s=>batchKeys.has(s.key)); }
@@ -376,7 +440,7 @@ function stackTiles(items, getCount, side) {
     while(left>0) {
       const stackCount = Math.min(left,item.stackLimit); left-=stackCount;
       const stackKey=`${side}:${item.id}:${index++}`;
-      const checked=batchMode&&side==='in'?batchKeys.has(stackKey):selected?.key===stackKey;
+      const checked=batchMode&&side==='in'?batchKeys.has(stackKey):(selected && selected.key===stackKey);
       result += `<button class="item-slot${checked?' selected':''}${batchMode&&side==='in'?' batch-cell':''}" data-stack-key="${stackKey}" data-item="${esc(item.id)}" data-side="${side}" data-count="${stackCount}" data-rarity="${item.rarity||'orange'}" data-category="${item.category}" data-stackable="${item.stackLimit>1}" aria-label="${esc(item.name)}，第${index}格，${stackCount}件${item.inheritable?'':'，不可继承'}" aria-pressed="${checked}"${state.completed?' disabled':''}>${art(item)}<span class="slot-quantity">${stackCount}</span>${batchMode&&side==='in'&&item.inheritable?`<span class="slot-check">${checked?'<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>':''}</span>`:''}${item.inheritable?'':'<span class="slot-lock">不可继承</span>'}<span class="slot-name">${esc(item.name)}</span></button>`;
       for(let s=1;s<item.slotsPerStack;s++) result+=`<div class="empty-slot continuation" aria-label="${esc(item.name)}的占位格"><span>占位 ${s+1}/${item.slotsPerStack}</span></div>`;
     }
@@ -385,7 +449,7 @@ function stackTiles(items, getCount, side) {
 }
 function renderGrids() {
   const active = document.activeElement;
-  const focusItem = active?.matches('.item-slot') ? active.dataset.stackKey : null;
+  const focusItem = (active && active.matches && active.matches('.item-slot')) ? active.dataset.stackKey : null;
   const used = usedSlots(config.items,state.stored);
   let inherited = stackTiles(config.items,id=>state.stored[id]||0,'out');
   for(let i=used;i<state.capacity;i++) inherited += `<div class="empty-slot">${i===used?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>':''}<span>${String(i+1).padStart(2,'0')}</span></div>`;
@@ -395,9 +459,9 @@ function renderGrids() {
   const mode=$('#sort').value;
   if(mode==='price') items.sort((a,b)=>b.price-a.price);
   else if(mode==='name') items.sort((a,b)=>a.name.localeCompare(b.name,'zh-CN'));
-  else items.sort((a,b)=>(rarityOrder[a.rarity]??9)-(rarityOrder[b.rarity]??9) || b.price-a.price || a.name.localeCompare(b.name,'zh-CN'));
+  else items.sort((a,b)=>(rarityOrder[a.rarity]===undefined?9:rarityOrder[a.rarity])-(rarityOrder[b.rarity]===undefined?9:rarityOrder[b.rarity]) || b.price-a.price || a.name.localeCompare(b.name,'zh-CN'));
   $('#original-grid').innerHTML = stackTiles(items,id=>(initial()[id]||0)-(state.stored[id]||0),'in') || '<p class="empty-message">没有符合条件的物品</p>';
-  if(focusItem) $$('[data-stack-key]').find(el=>el.dataset.stackKey===focusItem)?.focus({preventScroll:true});
+  if(focusItem) { const fe=$$('[data-stack-key]').find(el=>el.dataset.stackKey===focusItem); if(fe) fe.focus({preventScroll:true}); }
 }
 function renderInspector() {
   const active = document.activeElement;
@@ -406,7 +470,7 @@ function renderInspector() {
     const stacks=batchStacks(),count=stacks.reduce((n,s)=>n+s.count,0);
     const value=stacks.reduce((n,s)=>n+config.items.find(i=>i.id===s.id).price*s.count,0);
     let projected=usedSlots(config.items,state.stored),fits=true;
-    try{const next=transferBatch(config.items,initial(),state.stored,stacks.map(s=>({key:s.key,id:s.id,quantity:s.count})),state.capacity);projected=usedSlots(config.items,next);}catch{fits=false;}
+    try{const next=transferBatch(config.items,initial(),state.stored,stacks.map(s=>({key:s.key,id:s.id,quantity:s.count})),state.capacity);projected=usedSlots(config.items,next);}catch(e){fits=false;}
     $('#inspector').innerHTML=`<div class="item-description"><h3>已勾选 ${stacks.length} 格 · ${count} 件</h3><p class="item-unit-price">总价值 ${money(value)} 地铁币</p><p>${stacks.length?(fits?`预计占用 ${projected}/${state.capacity} 格`:'空间不足：请取消部分勾选，或先取出物品'):'在右侧逐格勾选，选中一堆会存入该堆全部数量'}</p></div><div class="batch-actions"><button id="clear-batch" class="secondary" ${!stacks.length?'disabled':''}>清空勾选</button><button id="batch-move" class="primary" ${!stacks.length||state.completed?'disabled':''}>批量存入 ${count} 件 ←</button></div>`;
     return;
   }
@@ -419,7 +483,7 @@ function renderInspector() {
   const available=selected.count;
   quantity=Math.max(1,Math.min(quantity,Math.max(1,available)));
   $('#inspector').innerHTML=`<div class="inspector-portrait">${art(item)}</div><div class="item-description"><h3>${esc(item.name)}</h3><p class="item-unit-price">${item.inheritable?`${money(item.price)} 地铁币 / 件`:'装备 · 不可继承'}</p></div>${item.inheritable?`<div class="inspector-actions"><div class="quantity-control"><button data-quantity="minus" aria-label="减少数量" ${quantity<=1?'disabled':''}>−</button><input id="quantity" type="number" min="1" max="${Math.max(1,available)}" value="${quantity}" aria-label="移动物品数量"><button data-quantity="plus" aria-label="增加数量" ${quantity>=available?'disabled':''}>+</button></div>${available>1?`<button class="max-button" id="whole-stack">整堆${isIn?'存入':'取出'} ${available} 件</button>`:''}<button class="primary" id="move" ${state.completed||available===0?'disabled':''}>${isIn?'存入':'取出'} <span id="move-count">${quantity}</span> 件 ${isIn?'←':'→'}</button></div>`:''}`;
-  if(focusSelector){const target=$(focusSelector);(target&&!target.disabled?target:$('#quantity'))?.focus({preventScroll:true});}
+  if(focusSelector){const target=$(focusSelector);const ft=(target&&!target.disabled?target:$('#quantity'));if(ft) ft.focus({preventScroll:true});}
 }
 function render() {
   $('#profile').value=state.profile; renderCapacities();
@@ -446,7 +510,7 @@ function showSettings(tab='setup') {
   $('main').inert=true;$('.topbar').inert=true;
   $('#participant-input').value=state.participant;$('#capacity-input').value=config.capacities.join(',');
   $('#config-error').textContent='';
-  const inheritable=config.items.filter(i=>i.inheritable).sort((a,b)=>(rarityOrder[a.rarity]??9)-(rarityOrder[b.rarity]??9));
+  const inheritable=config.items.filter(i=>i.inheritable).sort((a,b)=>(rarityOrder[a.rarity]===undefined?9:rarityOrder[a.rarity])-(rarityOrder[b.rarity]===undefined?9:rarityOrder[b.rarity]));
   $('#config-filters').innerHTML=`<button data-config-filter="all" aria-pressed="true" class="active">全部（${inheritable.length}）</button>`+Object.keys(rarityOrder).filter(k=>inheritable.some(i=>i.rarity===k)).map(k=>`<button data-config-filter="${k}" aria-pressed="false">${rarityNames[k]}（${inheritable.filter(i=>i.rarity===k).length}）</button>`).join('');
   $('#config-table tbody').innerHTML=inheritable.map((i,index,arr)=>`${index===0||arr[index-1].rarity!==i.rarity?`<tr data-config-group="${i.rarity}"><th colspan="7">${rarityNames[i.rarity]||i.rarity}品阶</th></tr>`:''}<tr data-config-rarity="${i.rarity}" data-config-item="${esc(i.id)}"><td><span class="config-item" data-rarity="${i.rarity||'orange'}"><img src="${ICONS[i.image]||''}" alt="">${esc(i.name)}<select data-rarity-edit="${esc(i.id)}" aria-label="${esc(i.name)} 品阶">${Object.keys(rarityOrder).map(k=>`<option value="${k}"${i.rarity===k?' selected':''}>${rarityNames[k]}</option>`).join('')}</select></span></td>${['price','stackLimit','slotsPerStack'].map(k=>`<td><input type="number" min="${k==='price'?0:1}" data-key="${k}" value="${i[k]}" ${k==='stackLimit'?'readonly':''} aria-label="${esc(i.name)} ${k}"></td>`).join('')}${['low','mid','high'].map(k=>`<td><input type="number" min="0" max="9999" data-profile="${k}" value="${config.profiles[k][i.id]||0}" aria-label="${esc(i.name)} ${labels[k]}数量"></td>`).join('')}</tr>`).join('');
   filterConfig('all');setTab(tab);$('#close-settings').focus();
@@ -468,7 +532,7 @@ function sheetEntries() {
   return config.items
     .filter(i => (state.stored[i.id] || 0) > 0)
     .map(i => ({id:i.id,name:i.name,rarity:i.rarity||'orange',price:i.price,image:i.image,qty:state.stored[i.id],subtotal:i.price*state.stored[i.id]}))
-    .sort((a,b) => (rarityOrder[a.rarity]??9)-(rarityOrder[b.rarity]??9) || b.price-a.price || a.name.localeCompare(b.name,'zh-CN'));
+    .sort((a,b) => (rarityOrder[a.rarity]===undefined?9:rarityOrder[a.rarity])-(rarityOrder[b.rarity]===undefined?9:rarityOrder[b.rarity]) || b.price-a.price || a.name.localeCompare(b.name,'zh-CN'));
 }
 function sheetHead() {
   const entries=sheetEntries();
@@ -502,6 +566,13 @@ function fitSheet(n, tries=0) {
   let rows=Math.ceil(n/cols);
   if((h-gap*(rows-1))/rows<40&&cols<maxCols){cols=maxCols;rows=Math.ceil(n/cols);}
   const cellH=(h-gap*(rows-1))/rows;
+  const cellW=(w-gap*(cols-1))/cols;
+  /* 数量角标随格子尺寸连续缩放：物品少→格子大→字大；物品多→格子小→字小但有可读下限。
+     字号由 JS 算好写进 CSS 变量，避免用 clamp()/min() 等旧版手机内核不支持的 CSS 函数。 */
+  const qtyFs=Math.round(Math.max(13,Math.min(40,Math.min(cellW,cellH)*0.26)));
+  grid.style.setProperty('--qty-fs',qtyFs+'px');
+  grid.style.setProperty('--qty-pad',Math.round(qtyFs*0.34)+'px');
+  grid.style.setProperty('--qty-radius',Math.round(qtyFs*0.2)+'px');
   grid.style.setProperty('--cols',cols);grid.style.setProperty('--rows',rows);
   grid.dataset.density=cellH>=100?'1':cellH>=66?'2':cellH>=46?'3':'4';
 }
@@ -588,8 +659,16 @@ async function buildSheetImage() {
     if(im)g.drawImage(im,cx+18,cy+14,78,78);
     else{g.fillStyle='#33404f';roundRect(g,cx+18,cy+14,78,78,8);g.fill();}
     if(x.qty>1){
-      g.fillStyle='#ee961b';roundRect(g,cx+cw-50,cy+12,38,26,6);g.fill();
-      g.fillStyle='#1a1206';g.font=`500 17px ${F}`;g.textAlign='center';g.fillText('×'+x.qty,cx+cw-31,cy+31);g.textAlign='left';
+      /* 与网页清单同步放大：1080px 画布上用 30px 粗体，框宽按位数自适应，保证手机截图/投屏看得清 */
+      const q='×'+x.qty;
+      g.font=`700 30px ${F}`;
+      const bw=Math.max(58,g.measureText(q).width+26),bh=44;
+      const bx=cx+cw-bw-10,by=cy+10;
+      g.fillStyle='rgba(0,0,0,.4)';roundRect(g,bx+2,by+3,bw,bh,8);g.fill();
+      g.fillStyle='#ee961b';roundRect(g,bx,by,bw,bh,8);g.fill();
+      g.fillStyle='#231d11';g.textAlign='center';g.textBaseline='middle';
+      g.fillText(q,bx+bw/2,by+bh/2+1);
+      g.textAlign='left';g.textBaseline='alphabetic';
     }
     g.fillStyle='#eef3f9';g.font=`24px ${F}`;g.fillText(fitText(g,x.name,cw-28),cx+14,cy+116);
     g.fillStyle=rarityColors[x.rarity]||'#888780';g.font=`20px ${F}`;g.fillText(rarityNames[x.rarity]||'',cx+14,cy+148);
@@ -610,7 +689,7 @@ function applyShareBlob(blob) {
   if(img.dataset.url)URL.revokeObjectURL(img.dataset.url);
   const url=URL.createObjectURL(blob);img.src=url;img.dataset.url=url;
   let canShare=false;
-  try{canShare=!!(navigator.share&&navigator.canShare&&navigator.canShare({files:[new File([blob],shareName,{type:'image/png'})]}));}catch{}
+  try{canShare=!!(navigator.share&&navigator.canShare&&navigator.canShare({files:[new File([blob],shareName,{type:'image/png'})]}));}catch(e){}
   $('#share-native').hidden=!canShare;
   return true;
 }
@@ -633,7 +712,7 @@ function collectedRounds() {
   if(!state.completed&&state.events.length){const r=snapshot('draft');const n=list.findIndex(x=>x.roundId===r.roundId);if(n<0)list.push(r);else list[n]=r;}
   return list;
 }
-function csvField(value) {let s=String(value??'');if(/^[=+\-@]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';}
+function csvField(value) {let s=String(value===undefined||value===null?'':value);if(/^[=+\-@]/.test(s))s="'"+s;return '"'+s.split('"').join('""')+'"';}
 function doExportCSV() {
   const rows=[['受访者','轮次ID','轮次','库存方案','容量','状态','物品ID','物品','初始数量','保留数量','单件变卖价','保留价值','占格','堆叠上限','每堆占格','价格状态','堆叠状态','总用格','本轮总价值','操作次数','满仓尝试','耗时秒']];
   for(const r of collectedRounds()) for(const i of r.configSnapshot.items) rows.push([r.participant,r.roundId,r.roundNumber,r.profileLabel,r.capacity,r.status,i.id,i.name,r.initial[i.id]||0,r.stored[i.id]||0,i.price,i.price*(r.stored[i.id]||0),slots(i,r.stored[i.id]||0),i.stackLimit,i.slotsPerStack,i.priceStatus,i.stackStatus||'not-applicable',r.usedSlots,r.totalValue,r.events.length,r.events.filter(e=>e.action==='blocked'&&e.reason==='capacity').length,Math.round(r.durationMs/1000)]);
@@ -648,7 +727,7 @@ function applyConfiguration(next) {
 }
 function moveSelected(n) {
   if(!selected||state.completed)return;
-  const before=usedSlots(config.items,state.stored),choice={...selected};
+  const before=usedSlots(config.items,state.stored),choice=Object.assign({},selected);
   try{
     if(n>choice.count)throw new Error('数量超出当前选中格，请选择其他格或使用批量选择');
     const next=transfer(config.items,initial(),state.stored,choice.id,n,choice.side,state.capacity);
@@ -668,7 +747,7 @@ document.addEventListener('click',e=>{
       if(!config.items.find(i=>i.id===stack.id).inheritable){notify('装备每格 1 件，但不能继承');return;}
       if(batchKeys.has(stack.key))batchKeys.delete(stack.key);else batchKeys.add(stack.key);
       record('batch-select',{stackKey:stack.key,itemId:stack.id,selected:batchKeys.has(stack.key),quantity:stack.count});
-    }else{batchMode=false;batchKeys.clear();selected=stack;quantity=1;record('select',{...stack});}
+    }else{batchMode=false;batchKeys.clear();selected=stack;quantity=1;record('select',Object.assign({},stack));}
     persist();render();return;
   }
   if(e.target.closest('#batch-toggle')&&!state.completed){batchMode=!batchMode;batchKeys.clear();selected=null;quantity=1;render();return;}
@@ -713,8 +792,8 @@ $('#sheet-card').addEventListener('dblclick',()=>{
 });
 $('#sheet-copy').addEventListener('click',()=>{
   const text=sheetCopyText();
-  const fallback=()=>{const ta=document.createElement('textarea');ta.value=text;document.body.append(ta);ta.select();try{document.execCommand('copy');notify('清单文本已复制');}catch{notify('复制失败，请在结果与导出中导出 JSON/CSV');}ta.remove();};
-  if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(()=>notify('清单文本已复制，可直接贴进会议记录'),fallback);else fallback();
+  const fallback=()=>{const ta=document.createElement('textarea');ta.value=text;document.body.append(ta);ta.select();try{document.execCommand('copy');notify('清单文本已复制');}catch(e){notify('复制失败，请在结果与导出中导出 JSON/CSV');}ta.remove();};
+  if((navigator.clipboard && navigator.clipboard.writeText))navigator.clipboard.writeText(text).then(()=>notify('清单文本已复制，可直接贴进会议记录'),fallback);else fallback();
 });
 $('#sheet-image').addEventListener('click',openShare);
 async function redrawShare(){
@@ -780,8 +859,8 @@ $('#apply-config').addEventListener('click',()=>{
 });
 $('#copy-site-link').addEventListener('click',()=>{
   const link=location.origin+location.pathname;
-  const fb=()=>{const ta=document.createElement('textarea');ta.value=link;document.body.append(ta);ta.select();try{document.execCommand('copy');notify('本副本链接已复制');}catch{notify('复制失败，请手动复制地址栏');}ta.remove();};
-  if(navigator.clipboard?.writeText)navigator.clipboard.writeText(link).then(()=>notify('本副本链接已复制'),fb);else fb();
+  const fb=()=>{const ta=document.createElement('textarea');ta.value=link;document.body.append(ta);ta.select();try{document.execCommand('copy');notify('本副本链接已复制');}catch(e){notify('复制失败，请手动复制地址栏');}ta.remove();};
+  if((navigator.clipboard && navigator.clipboard.writeText))navigator.clipboard.writeText(link).then(()=>notify('本副本链接已复制'),fb);else fb();
 });
 $('#export-config').addEventListener('click',()=>exportFile('仓库测试配置.json',JSON.stringify(config,null,2)));
 $('#import-config').addEventListener('change',async e=>{try{const file=e.target.files[0];if(!file)return;if(file.size>1000000)throw new Error('配置文件不能超过1MB');const next=JSON.parse(await file.text());applyConfiguration(next);}catch(err){$('#config-error').textContent=`导入失败：${err.message}`;}finally{e.target.value='';}});
@@ -791,8 +870,8 @@ window.addEventListener('pagehide',persist);
 try {
   const defaults=INLINE_CONFIG, sources=INLINE_SOURCES;
   config=validateConfig(defaults);
-  let previous=null;try{previous=JSON.parse(localStorage.getItem(key)||'null');}catch{storageOK=false;}
-  if(previous?.config&&previous?.state){try{config=validateConfig(previous.config);state=previous.state;rounds=previous.rounds||[];}catch{previous=null;}}
+  let previous=null;try{previous=JSON.parse(localStorage.getItem(key)||'null');}catch(e){storageOK=false;}
+  if(previous&&previous.config&&previous.state){try{config=validateConfig(previous.config);state=previous.state;rounds=previous.rounds||[];}catch(e){previous=null;}}
   if(!state)state={roundId:uid(),participant:`P-${Math.random().toString(36).slice(2,6).toUpperCase()}`,roundNumber:1,profile:'mid',capacity:10,stored:{},events:[],startedMs:Date.now(),completed:false};
   if((config.version||1)<8){
     if(state.events.length&&!state.completed)saveRound('auto-saved');
